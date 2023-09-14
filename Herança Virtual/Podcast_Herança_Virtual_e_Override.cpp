@@ -26,8 +26,6 @@ class Musica{
       artista = a;
    }
    
-   
-   
    string get_titulo(){
        return titulo;
    }
@@ -56,9 +54,7 @@ class MusicaLocal: public Musica{
     MusicaLocal(const string& t, const string& a, const string& c)
         : Musica(t, a), caminhoArquivo(c) {}
 
-
-    
-    string get_caminho(){
+    string get_caminho(){ 
         return caminhoArquivo;
     }
     
@@ -67,9 +63,10 @@ class MusicaLocal: public Musica{
     }
     
     virtual void tocar(){
-        cout << "Música: " << get_titulo()<< endl;
+        cout << "Musica: " << get_titulo()<< endl;
         cout << "Artista: " << get_artista() << endl;
         cout << "Caminho do Arquivo: " << caminhoArquivo << endl <<endl;
+        cout << "-----------------------------------------------"<<endl;
     }
 };
 
@@ -88,9 +85,10 @@ class MusicaStreaming: public Musica {
     }
     
     virtual void tocar(){
-        cout << "Música: " << get_titulo()<< endl;
+        cout << "Musica: " << get_titulo()<< endl;
         cout << "Artista: " << get_artista() << endl;
         cout << "URL: " << URL << endl <<endl;
+        cout << "-----------------------------------------------"<<endl;
     }
     
 };
@@ -101,13 +99,13 @@ class Podcast: public Musica {
    
 protected:
    void tocarIntro () override {
-       cout << "O Podcast vai começar" << endl;
+       cout << "Podcast em execucao" << endl;
    }
    
 public:
    
-   Podcast(const string& t,const string& a,const string& ap, const vector<string>& e)
-   : Musica(t,a), apresentador(ap), episodios(e){}
+   Podcast(const string& t,const string& a,const string& ap, const vector<string>& eps)
+   : Musica(t,a), apresentador(ap), episodios(eps){}
    
    void adicionar_epi(const string& episodio){
        episodios.push_back(episodio);
@@ -128,46 +126,99 @@ public:
     
     virtual void tocar() override{
         tocarIntro(); //chama o metodo tocarIntro da classe base
-        cout << "Título do Podcast: " << get_titulo() << endl;
+        cout << "Titulo do Podcast: " << get_titulo() << endl;
         cout << "Rede / Produtora: " << get_artista() << endl;
-        cout << "Apresentador(a): " << apresentador << endl;
+        cout << "Apresentador(a): " << apresentador << endl<<endl;
         
         cout << "Episodios: " << endl; 
         for(const string& ep : episodios){
-            cout << ep << endl <<endl;
+            cout << ep <<endl;
             
         }
+        cout << endl;
+        cout << "-----------------------------------------------"<<endl;
         
     }
+};
+
+class PodcastPremium: private Podcast {
+    private:
+        float preco;
+        //bool AssinaturaAtiva; // 0 - nao, 1 - sim ->dps testo isso
+
+    public:
+        PodcastPremium(const string& t, const string& a, const string& ap, const vector<string>& eps, float p)
+        : Podcast(t, a, ap, eps), preco(p){}
+
+    //metodo para obter o preço 
+    float get_preco() const{
+        return preco;
+    }
+
+    void set_preco(float p){
+        preco = p;
+    }
+
+   /* void ativarAssinatura (){
+        assinaturaAtiva = true;
+    }*/
+
+//Método para add um episodio (override do método da classe base)
+void adicionar_episodio(const string& eps){
+    Podcast::adicionar_epi(eps);
+    }
+
+//Método para tocar o podcast (override do método tocar da classe base)
+void tocar () {
+    Podcast::tocar();
+    }
+
 };
 
 
 
 int main()
 {
-    MusicaLocal m1("cake","dnce","endereco/com/br");
-    MusicaLocal m2("all i ask","adele","endereco/com/uk");
+    //musicas local
+    MusicaLocal ml1("cake","dnce","endereco1/com/br");
+    MusicaLocal ml2("all i ask","adele","endereco2/com/uk");
     
+    //musicas em streaming
+    MusicaStreaming ms1("sonifera ilha","titas","url1");
+    ms1.tocar();
     
-    MusicaStreaming ms("cake","dnce","url1");
-    ms.tocar();
+    vector<Musica*>playlist; //vetor de ponteiros do tipo Musica
     
-    vector<Musica*>playlist;
-    
-    playlist.push_back(&m1);
-    playlist.push_back(&m2);
-    
-    for(Musica* msc:playlist){
-        msc->tocar();
-    }
-    
-    vector<string> lista_epis;
+    //adicionando musicas na playlist
+    playlist.push_back(&ml1);
+    playlist.push_back(&ml2);
+    playlist.push_back(&ms1);
+
+    //podcasts
+
+    vector<string> lista_epis; 
     lista_epis.push_back("episodio 1");
     lista_epis.push_back("episodio 2");
 
     Podcast p1("podcre", "globo", "xuxa", lista_epis);
-    p1.tocar();
+    //p1.tocar();
+
+    vector<string> lista_epis_p; 
+    lista_epis_p.push_back("episodio 1");
+    lista_epis_p.push_back("episodio 2");
+
     
+
+    //adicionando podcasts
+    playlist.push_back(&p1);
+    //playlist.push_back(&pp1);
+    
+    for(Musica* msc:playlist){ //estrutura de repetiçao para tocar as musicas e podcasts da playlist
+        msc->tocar();
+    }
+    
+    PodcastPremium pp1("tea with bob", "hbo", "bob the drag queen", lista_epis_p,12.90);
+    pp1.tocar();
     
 
     return 0;
@@ -176,4 +227,7 @@ int main()
 /*perguntas pro prof:
 
 -qual a diferença de caminhoArquivo e URL
+-pq lista_epis não é um vetor de ponteiros?
+-era bom ter um bool para diferenciar Podcast Normal e Podcast Premium? 
+-nao dá pra colocar um objeto PodcastPremium
 */
