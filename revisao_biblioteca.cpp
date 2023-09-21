@@ -19,6 +19,8 @@ public:
     void set_nome(const string& n){nome =  n;}
     int get_idade(){return idade;}
     void get_nome(int i){idade = i;}
+
+    virtual void exibir()=0
 };
 
 class estudante: public usuario{
