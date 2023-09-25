@@ -20,6 +20,8 @@ public:
         nome = "";
     }
 
+    virtual ~usuario() {}
+
     string get_nome()const{return nome;}
     void set_nome(const string& n){nome =  n;}
     int get_idade() const {return idade;}
@@ -43,6 +45,8 @@ class estudante: public usuario{
 
 public:
     estudante(const string& n, int i, int m, const string& c): usuario(n,i), matricula(m), curso(c){}
+
+    virtual ~estudante() {}
 
     //gets e sets
     
@@ -68,6 +72,8 @@ class professor: public usuario{
 public:
     professor(const string& n, int i, const string& d): usuario(n,i), dep(d){}
 
+    virtual ~professor() {}
+
     string get_dep(){return dep;}
     void set_dep(const string& d){dep = d;}
 
@@ -88,6 +94,8 @@ class material{
 public:
     material(const string& t):titulo(t){}
 
+    virtual ~material() {}
+
     string get_titulo() const {return titulo;}
     void set_titulo(const string& t){titulo =  t;}
 
@@ -97,6 +105,8 @@ virtual void exibir() = 0;// nas subclasses ela detalha tbm
 class livro: public material{
     string autor;
     int ano_publicacao;
+
+    virtual ~livro() {}
 
 public:
     livro(const string& t,const string& au,int ano): material(t), autor(au),ano_publicacao(ano){}
@@ -124,6 +134,8 @@ class revista: public material{
     
 public:
     revista(const string& t,int e): material(t), num_edicao(e){}
+
+    virtual ~revista() {}
     
     //gets e sets
     int get_num_edicao(){return num_edicao;}
@@ -261,6 +273,8 @@ int main(){
 
     biblio->emprestar_material(user1,mat1,1,"24/09/2023");
     biblio->listar_emprestimos();
+
+    biblio->desalocar_recursos();
 
     return 0;
 }
