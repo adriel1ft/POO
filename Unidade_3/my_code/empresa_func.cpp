@@ -10,12 +10,25 @@ class funcionario{
     int id;
     float salario;
     static int contador; // n pode inicializar dentro da classe
+
+protected:
+    static void add_contador(){
+        contador++;
+    }
+
+    static void dec_contador(){
+        contador--;
+    }
+
     
 public:
 funcionario(const string& n, int i, float s): nome(n), id(i), salario(s) {
     contador++;
 }
-    ~funcionario(){contador--;}
+    //~funcionario(){contador--;} prof n usou mais isso
+    static void get_contador(){
+        return contador;
+    }
     
     virtual void print_info(){
         cout << "funcionario" << endl;
@@ -23,22 +36,28 @@ funcionario(const string& n, int i, float s): nome(n), id(i), salario(s) {
         cout << "id: " << id << " | ";
         cout << "salario" << salario << endl;
     }
+
+    string& get_nome(){
+        return nome;
+    }
 };
+
+int funcionario::contador = 0;
 
 class empregado_regular: public funcionario{
     int codigo_categoria;
 
 public:
-empregado_regular(int cc, const string& n, int i, float s ): funcionario(n,i,s), codigo_categoria(cc){}
+empregado_regular(int cc, const string& n, int i, float s ): funcionario(n,i,s), codigo_categoria(cc){ funcionario::add_contador();}
 
 virtual void print_info(){
-        funcionario::print_info();
-        cout << "gerente: " << endl;
-        cout << "bonus: " << bonus << endl;
-    }
+    funcionario::print_info();
+    cout << "Regular" << endl;
+    cout << "Codigo: " << codigo_categoria << endl;
+}
     
 
-};
+
 
 //gets e sets
 
@@ -49,15 +68,27 @@ class gerente: public funcionario{
     float bonus;
 
 public:
-    gerente(float b, const string& n, int i, float s): funcionario(n,i,s), bonus(b){}
+    gerente(float b, const string& n, int i, float s): funcionario(n,i,s), bonus(b){ funcionario::add_contador(); }
     
+    virtual void print_info(){
+    funcionario::print_info();
+    cout << "Gerente" << endl;
+    cout << "Bonus: " << bonus << endl;
+}
 };
 
 class estagiario: public funcionario{
     string data_nascimento;
 
 public:
-    estagiario( const string& d, const string& n, int i, float s): funcionario(n,i,s), bonus(b){}
+    estagiario( const string& d, const string& n, int i, float s): funcionario(n,i,s), data_nascimento(d){}
+
+
+    virtual void print_info(){
+        funcionario::print_info();
+        cout << "Estagiario: " << endl;
+        cout << "Data de aniversario: " << data_nascimento << endl;
+    }
 };
 
 class empregado_gerente: public empregado_regular, public gerente{
