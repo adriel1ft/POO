@@ -1,14 +1,16 @@
 #include <iostream>
 #include <string>
-//#include <map>
-//#include <vector>
+#include <map>
+#include <vector>
 
 using std::string;
 using std::cout;
 using std::cin;
 using std::endl;
-//using std::map;
-//using std::vector;
+using std::map;
+using std::vector;
+using std::ostream;
+using std::exception;
 
 class pagamento{
 
@@ -54,7 +56,7 @@ public:
         return instance;   
         }*/
 
-    
+
 
 };
 
@@ -99,6 +101,15 @@ public:
 
 };
 
+class LimiteCreditoExcedidoException: public exception{
+public:
+    LimiteCreditoExcedidoException() = default;
+
+    const char* what() const throw(){ // descreve o motivo da excecao
+        return "Limite de crédito excedido";
+    }
+};
+
 template <typename T>
 class fatura{
     double limite_credito;
@@ -107,11 +118,11 @@ class fatura{
     public:
 
     fatura(double lc):limite_credito(lc){
-    
+
         /*vetor vazio do tipo T -> tipo do pagamento
         especificado qnd vc criar uma instancia da classe fatura
         dessa forma eu posso escolher se vem de pgmt  online ou presencial*/
-        
+
         pagamentos = vector<T>(); 
 
     }
@@ -124,10 +135,7 @@ class fatura{
         limite_credito = lc;
     }
 
-    void add_pagamento(T* pagamento){
-        pagamentos.push_back(pagamento);
-        limite_credito += pagamento;
-    }
+    
 
     double calcular_valor_total() const {
         double total = 0;
@@ -137,6 +145,14 @@ class fatura{
         return total;
 
     }
+
+    void add_pagamento(const T& pagamento){
+        if (limite_credito < pagamento->get_valor() + calcular_valor_total()){
+            throw (LimiteCreditoExcedidoException()); //lança a msg da excecao
+    }
+    pagamentos.push_back(pagamento);
+    limite_credito -= pagamento.get_valor();
+}
 
     //listar pagamentos dps eu faço
     void listar_pagamentos(){
@@ -149,7 +165,7 @@ class fatura{
     }
 
     friend ostream& operator<<(ostream& os, const fatura& f){
-        os << "Fatura: " << f.get_limite_credito();
+        os << "Fatura: " << f.get_limite_credito() << endl;
         os << f.listar_pagamentos;
         return os;
     }
@@ -157,7 +173,7 @@ class fatura{
 
 
     fatura& operator+(const T* pagamento){
-        pagamentos.push_back(p);
+        pagamentos.push_back(pagamento);
         return *this;
     }
 
@@ -169,13 +185,29 @@ class fatura{
         return *this;
     }
 
-    //tratamento de excecoes
-    try{
-        fatura + pagamento1;
+    template <typename R>
+    friend void transferir_pagamentos(fatura<R>& f1, fatura<R>& f2){
+        for(const R* p : f1.pagamentos){
+            f2.add_pagamento(p);
+        }
+        f1.pagamentos.clear(); // garantir que os pagamentos não sejam duplicados
+            
+    }
 
-    } cat
 
 };
+
+
+int main(){
+    fatura<pagamento> fatura1(1500);
+
+    //criando pagamentos
+    pagamento_online pag_o1(100, "01/01/2021","Pedro", "site1",7985);
+    pagamento_presencial pag_p1(700, "01/01/2021","Li", "loja1");
+    pagamento_presencial pag_p2(350.50, "01/01/2021","Anna", "loja1");
+
+    
+}
 
 
 /*perguntas pro prof
